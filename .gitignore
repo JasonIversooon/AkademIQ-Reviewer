@@ -1,0 +1,70 @@
+# Generic
+.DS_Store
+Thumbs.db
+
+# Environment files (don't commit secrets)
+.env
+*.env
+.env.* 
+.env.local
+backend/.env
+*/.env
+
+# Python
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Virtual environments
+.venv/
+venv/
+env/
+env.bak/
+backend/.venv/
+
+# Packaging / build
+build/
+dist/
+*.egg-info/
+pip-wheel-metadata/
+*.whl
+
+# Tooling / caches
+.pytest_cache/
+pytest_cache/
+.mypy_cache/
+.coverage
+coverage.xml
+htmlcov/
+.cache/
+pip-log.txt
+pip-delete-this-directory.txt
+.venv
+.Python
+
+# IDEs and editors
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+*.swp
+*.swo
+
+# Node / frontend
+node_modules/
+npm-debug.log*
+yarn-error.log
+pnpm-lock.yaml
+
+# Logs and databases
+*.log
+*.sqlite3
+*.db
+
+# Misc
+*.bak
+*.tmp
+*.backup
