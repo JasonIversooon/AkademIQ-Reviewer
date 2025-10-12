@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 
+const API_BASE = "http://192.168.100.25:8000";
+
 interface Props {
   onAuth: (token: string) => void;
   token: string | null;
@@ -15,7 +17,7 @@ export const AuthPanel: React.FC<Props> = ({ onAuth, token }) => {
   async function submit() {
     setLoading(true); setError(null);
     try {
-      const res = await fetch(`http://127.0.0.1:8000/auth/${mode}`, {
+      const res = await fetch(`${API_BASE}/auth/${mode}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })

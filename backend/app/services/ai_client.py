@@ -1,10 +1,9 @@
-from . import prompts  # noqa: F401 (placeholder for future)
 from app.core.config import get_settings
 import httpx
 import json
 import logging
 from groq import AsyncGroq, GroqError
-from .prompts import FLASHCARD_PROMPT_TEMPLATE, EXPLANATION_PROMPT_TEMPLATE
+from app.utils.prompts import FLASHCARD_PROMPT_TEMPLATE, EXPLANATION_PROMPT_TEMPLATE
 
 logger = logging.getLogger("ai_client")
 

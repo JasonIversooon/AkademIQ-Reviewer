@@ -1,7 +1,15 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, Header
 from app.core.config import get_settings
 from app.services.pdf_extractor import extract_text_and_validate, PDFPageLimitError
-from app.schemas.documents import DocumentUploadResponse, FlashcardGenerationRequest, FlashcardListResponse, ExplanationRequest, ExplanationResponse, FlashcardStatusUpdate
+from app.schemas.documents import (
+    DocumentUploadResponse,
+    Flashcard,
+    FlashcardGenerationRequest,
+    FlashcardListResponse,
+    ExplanationRequest,
+    ExplanationResponse,
+    FlashcardStatusUpdate,
+)
 from app.services import ai_client
 from app.core.supabase_client import get_supabase
 import uuid
