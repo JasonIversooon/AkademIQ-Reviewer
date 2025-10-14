@@ -9,7 +9,7 @@ class Settings(BaseModel):
     openai_api_key: str | None = None  # legacy (unused now)
     groq_api_key: str | None = None    # added
     ai_model: str = "openai/gpt-oss-20b"
-    max_pdf_pages: int = 10
+    max_pdf_pages: int = 15
 
     class Config:
         arbitrary_types_allowed = True
@@ -23,5 +23,5 @@ def get_settings() -> Settings:
         openai_api_key=os.getenv("OPENAI_API_KEY"),
         groq_api_key=os.getenv("GROQ_API_KEY"),  # added
         ai_model=os.getenv("AI_MODEL", "openai/gpt-oss-20b"),
-        max_pdf_pages=int(os.getenv("MAX_PDF_PAGES", "10")),
+        max_pdf_pages=int(os.getenv("MAX_PDF_PAGES", "15")),
     )

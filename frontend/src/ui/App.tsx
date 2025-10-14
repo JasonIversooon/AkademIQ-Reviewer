@@ -3,6 +3,7 @@ import { AuthPanel } from '../components/AuthPanel';
 import { UploadPanel } from '../components/UploadPanel';
 import { FlashcardsPanel } from '../components/FlashcardsPanel';
 import { ExplainPanel } from '../components/ExplainPanel';
+import { QuizPanel } from '../components/QuizPanel';
 
 export const App: React.FC = () => {
   const [token, setToken] = useState<string | null>(null);
@@ -16,6 +17,8 @@ export const App: React.FC = () => {
       <UploadPanel token={token} onUploaded={(id) => setDocumentId(id)} />
       <hr />
       <FlashcardsPanel token={token} documentId={documentId} />
+      <hr />
+      <QuizPanel token={token} documentId={documentId} />
       <hr />
       <ExplainPanel token={token} documentId={documentId} />
     </div>

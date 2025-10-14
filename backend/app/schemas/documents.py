@@ -13,6 +13,7 @@ class Flashcard(BaseModel):
 
 class FlashcardGenerationRequest(BaseModel):
     count: int | None = 12
+    difficulty: str = "medium"  # easy | medium | hard
 
 class FlashcardListResponse(BaseModel):
     flashcards: List[Flashcard]
@@ -26,3 +27,28 @@ class ExplanationResponse(BaseModel):
 
 class FlashcardStatusUpdate(BaseModel):
     status: str
+
+class QuizQuestion(BaseModel):
+    id: str
+    question: str
+    options: List[str]
+    correct_answer: int  # Index of correct option (0-3)
+    explanation: str
+
+class QuizGenerationRequest(BaseModel):
+    difficulty: str = "medium"  # easy | medium | hard
+
+class QuizResponse(BaseModel):
+    quiz_id: str
+    difficulty: str
+    questions: List[QuizQuestion]
+
+class QuizAnswerRequest(BaseModel):
+    answers: List[int]  # List of selected option indices
+
+class QuizResultResponse(BaseModel):
+    quiz_id: str
+    score: int
+    total_questions: int
+    percentage: float
+    results: List[dict]  # Question results with correct/incorrect info
