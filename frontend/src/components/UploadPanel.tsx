@@ -31,11 +31,49 @@ export const UploadPanel: React.FC<Props> = ({ token, onUploaded }) => {
   }
 
   return (
-    <section>
-      <h2>Upload PDF</h2>
-      <input type="file" accept="application/pdf" onChange={e => setFile(e.target.files?.[0] || null)} />
-      <button disabled={!file} onClick={upload}>Upload</button>
-      {status && <p>{status}</p>}
-    </section>
+    <div>
+      <div className="file-upload" onClick={() => document.getElementById('file-input')?.click()}>
+        <input 
+          id="file-input"
+          type="file" 
+          accept="application/pdf" 
+          onChange={e => setFile(e.target.files?.[0] || null)}
+          style={{ display: 'none' }}
+        />
+        <div style={{ textAlign: 'center' }}>
+          {file ? (
+            <>
+              <p style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>📄 {file.name}</p>
+              <p style={{ color: '#666', fontSize: '0.9rem' }}>Click to change file</p>
+            </>
+          ) : (
+            <>
+              <p style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>📁 Click to select PDF</p>
+              <p style={{ color: '#666', fontSize: '0.9rem' }}>Or drag and drop your file here</p>
+            </>
+          )}
+        </div>
+      </div>
+      
+      {file && (
+        <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+          <button className="btn btn-primary" disabled={!file} onClick={upload}>
+            {status === 'Uploading...' ? <span className="loading-spinner"></span> : 'Upload PDF'}
+          </button>
+        </div>
+      )}
+      
+      {status && (
+        <p className={
+          status === 'Uploaded' ? 'status-success' : 
+          status.startsWith('Error') ? 'status-error' : 
+          'status-loading'
+        }>
+          {status === 'Uploaded' ? '✅ Upload successful!' : 
+           status === 'Uploading...' ? '⏳ Uploading...' : 
+           status}
+        </p>
+      )}
+    </div>
   );
 };
