@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ExplainPanel } from '../components/ExplainPanel';
+import '../styles/FeaturePage.css';
 
 export const ExplainPage: React.FC = () => {
   const location = useLocation();

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { FlashcardsPanel } from '../components/FlashcardsPanel';
+import '../styles/FeaturePage.css';
 
 export const FlashcardsPage: React.FC = () => {
   const location = useLocation();

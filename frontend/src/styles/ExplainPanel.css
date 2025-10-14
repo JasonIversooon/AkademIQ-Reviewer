@@ -1,0 +1,185 @@
+/* ExplainPanel Component Styles */
+.explain-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.explain-controls {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.explain-controls .form-group {
+  margin: 0;
+  flex: 0 0 auto;
+}
+
+.explain-select {
+  min-width: 200px;
+}
+
+.explain-status {
+  margin-bottom: 1rem;
+}
+
+.explanation-content {
+  background: #f8fafc;
+  border-left: 4px solid #667eea;
+  border-radius: 0 8px 8px 0;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  line-height: 1.6;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.explanation-content h1,
+.explanation-content h2,
+.explanation-content h3 {
+  color: #2d3748;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+.explanation-content h1 {
+  font-size: 1.5rem;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 0.5rem;
+}
+
+.explanation-content h2 {
+  font-size: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.explanation-content h3 {
+  font-size: 1.1rem;
+  margin-top: 1rem;
+}
+
+.explanation-content p {
+  margin-bottom: 1rem;
+  color: #4a5568;
+}
+
+.explanation-content ul,
+.explanation-content ol {
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.explanation-content li {
+  margin-bottom: 0.5rem;
+  color: #4a5568;
+}
+
+.explanation-content strong {
+  color: #2d3748;
+  font-weight: 600;
+}
+
+.explanation-content em {
+  color: #667eea;
+  font-style: italic;
+}
+
+.explanation-content code {
+  background: #edf2f7;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+}
+
+.explanation-content blockquote {
+  border-left: 3px solid #cbd5e0;
+  padding-left: 1rem;
+  margin: 1rem 0;
+  font-style: italic;
+  color: #666;
+}
+
+.explain-empty {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: #666;
+}
+
+.explain-empty .empty-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.explain-empty h3 {
+  margin-bottom: 0.5rem;
+  color: #4a5568;
+}
+
+.explain-empty p {
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.explain-styles-info {
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.explain-styles-info h4 {
+  color: #4a5568;
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.style-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.style-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.style-icon {
+  font-size: 1rem;
+}
+
+/* Responsive Design for ExplainPanel */
+@media (max-width: 768px) {
+  .explain-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  
+  .explain-controls .form-group {
+    width: 100%;
+  }
+  
+  .explain-select {
+    min-width: 100%;
+  }
+  
+  .explanation-content {
+    padding: 1rem;
+  }
+  
+  .explanation-content h1 {
+    font-size: 1.3rem;
+  }
+  
+  .explanation-content h2 {
+    font-size: 1.15rem;
+  }
+}

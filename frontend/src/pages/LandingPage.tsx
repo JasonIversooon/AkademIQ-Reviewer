@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import '../styles/LandingPage.css';
 
 const API_BASE = (import.meta.env?.VITE_API_BASE as string) || 'http://192.168.0.142:8000';
 

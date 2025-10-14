@@ -1,0 +1,62 @@
+/* AuthPanel Component Styles */
+.auth-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-panel .auth-success {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: rgba(56, 161, 105, 0.1);
+  border: 1px solid #38a169;
+  border-radius: 8px;
+  color: #38a169;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.auth-panel .auth-form {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.auth-panel .form-group {
+  flex: 1;
+  min-width: 200px;
+  margin-bottom: 0;
+}
+
+.auth-panel .form-group.select-group {
+  flex: 0 0 auto;
+  min-width: 120px;
+}
+
+.auth-panel .form-group.button-group {
+  flex: 0 0 auto;
+}
+
+.auth-panel .auth-error {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: rgba(229, 62, 62, 0.1);
+  border: 1px solid #e53e3e;
+  border-radius: 8px;
+  color: #e53e3e;
+  font-weight: 500;
+}
+
+/* Responsive Design for AuthPanel */
+@media (max-width: 768px) {
+  .auth-panel .auth-form {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .auth-panel .form-group {
+    min-width: 100%;
+  }
+}

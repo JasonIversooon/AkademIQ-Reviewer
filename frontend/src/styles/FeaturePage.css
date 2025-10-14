@@ -1,0 +1,112 @@
+/* Feature Pages Styles */
+.feature-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 2rem;
+}
+
+.feature-header {
+  max-width: 1200px;
+  margin: 0 auto 2rem;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.back-btn {
+  flex-shrink: 0;
+}
+
+.feature-title h1 {
+  color: white;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.feature-title p {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.1rem;
+}
+
+.feature-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.feature-panel {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.coming-soon {
+  text-align: center;
+  padding: 3rem;
+}
+
+.coming-soon-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.coming-soon h3 {
+  color: #4a5568;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.coming-soon p {
+  color: #666;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.coming-soon ul {
+  text-align: left;
+  display: inline-block;
+  margin: 1.5rem 0;
+}
+
+.coming-soon li {
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+/* Responsive Design for Feature Pages */
+@media (max-width: 1024px) {
+  .feature-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .feature-page {
+    padding: 1rem;
+  }
+  
+  .feature-title h1 {
+    font-size: 2rem;
+  }
+  
+  .feature-panel {
+    padding: 1rem;
+  }
+  
+  .coming-soon {
+    padding: 2rem 1rem;
+  }
+  
+  .coming-soon-icon {
+    font-size: 3rem;
+  }
+  
+  .coming-soon h3 {
+    font-size: 1.5rem;
+  }
+}

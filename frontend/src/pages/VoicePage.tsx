@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import '../styles/FeaturePage.css';
 
 export const VoicePage: React.FC = () => {
   const location = useLocation();

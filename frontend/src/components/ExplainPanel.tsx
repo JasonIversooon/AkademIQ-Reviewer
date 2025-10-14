@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import '../styles/ExplainPanel.css';
 
-const API_BASE = (import.meta.env.VITE_API_BASE as string) || 'http://192.168.0.142:8000';
+const API_BASE = (import.meta.env?.VITE_API_BASE as string) || 'http://192.168.0.142:8000';
 
 interface Props {
   token: string | null;
@@ -26,10 +27,10 @@ export const ExplainPanel: React.FC<Props> = ({ token, documentId }) => {
   }
 
   return (
-    <div>
-      <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
-        <div className="form-group" style={{ margin: 0 }}>
-          <select className="form-select" value={style} onChange={e => setStyle(e.target.value)}>
+    <div className="explain-panel">
+      <div className="explain-controls">
+        <div className="form-group">
+          <select className="form-select explain-select" value={style} onChange={e => setStyle(e.target.value)}>
             <option value="layman">👥 Layman (Simple explanation)</option>
             <option value="professor">🎓 Professor (Academic style)</option>
             <option value="industry">🏢 Industry (Professional context)</option>
@@ -40,7 +41,7 @@ export const ExplainPanel: React.FC<Props> = ({ token, documentId }) => {
         </button>
       </div>
 
-      {loading && <p className="status-loading">⏳ Generating explanation...</p>}
+      {loading && <div className="explain-status status-loading">⏳ Generating explanation...</div>}
       
       {content && (
         <div className="explanation-content">
@@ -48,8 +49,28 @@ export const ExplainPanel: React.FC<Props> = ({ token, documentId }) => {
         </div>
       )}
       
+      <div className="explain-styles-info">
+        <h4>💡 Explanation Styles</h4>
+        <div className="style-options">
+          <div className="style-option">
+            <span className="style-icon">👥</span>
+            <span><strong>Layman:</strong> Simple, easy-to-understand explanations for general audiences</span>
+          </div>
+          <div className="style-option">
+            <span className="style-icon">🎓</span>
+            <span><strong>Professor:</strong> Academic, detailed explanations with theoretical context</span>
+          </div>
+          <div className="style-option">
+            <span className="style-icon">🏢</span>
+            <span><strong>Industry:</strong> Professional, practical explanations focused on applications</span>
+          </div>
+        </div>
+      </div>
+      
       {!documentId && (
-        <div style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
+        <div className="explain-empty">
+          <div className="empty-icon">💡</div>
+          <h3>No document loaded</h3>
           <p>Upload a document first to generate explanations</p>
         </div>
       )}

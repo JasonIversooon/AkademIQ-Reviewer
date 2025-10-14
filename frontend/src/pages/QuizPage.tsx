@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { QuizPanel } from '../components/QuizPanel';
+import '../styles/FeaturePage.css';
 
 export const QuizPage: React.FC = () => {
   const location = useLocation();

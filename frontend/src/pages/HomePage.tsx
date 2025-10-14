@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UploadPanel } from '../components/UploadPanel';
+import '../styles/HomePage.css';
 
 interface Props {
   token: string | null;

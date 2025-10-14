@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import '../styles/FlashcardsPanel.css';
 
-const API_BASE = (import.meta.env.VITE_API_BASE as string) || 'http://192.168.0.142:8000';
+const API_BASE = (import.meta.env?.VITE_API_BASE as string) || 'http://192.168.0.142:8000';
 
 interface Props {
   token: string | null;
@@ -45,9 +46,9 @@ export const FlashcardsPanel: React.FC<Props> = ({ token, documentId }) => {
   }
 
   return (
-    <div>
-      <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
-        <div className="form-group" style={{ margin: 0 }}>
+    <div className="flashcards-panel">
+      <div className="flashcards-controls">
+        <div className="form-group">
           <select className="form-select" value={difficulty} onChange={e => setDifficulty(e.target.value)}>
             <option value="easy">Easy</option>
             <option value="medium">Medium</option>
@@ -62,11 +63,11 @@ export const FlashcardsPanel: React.FC<Props> = ({ token, documentId }) => {
         </button>
       </div>
       
-      {loading && <p className="status-loading">⏳ Generating flashcards...</p>}
-      {error && <p className="status-error">❌ {error}</p>}
+      {loading && <div className="flashcards-status status-loading">⏳ Generating flashcards...</div>}
+      {error && <div className="flashcards-status status-error">❌ {error}</div>}
       
       {cards.length > 0 && (
-        <div className="card-list">
+        <div className="flashcards-grid">
           {cards.map(c => (
             <div key={c.id} className={`flashcard ${c.status}`}>
               <div className="flashcard-question">{c.question}</div>
@@ -85,8 +86,10 @@ export const FlashcardsPanel: React.FC<Props> = ({ token, documentId }) => {
       )}
       
       {!loading && cards.length === 0 && documentId && (
-        <div style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
-          <p>No flashcards generated yet. Click "Generate" to create flashcards from your document.</p>
+        <div className="flashcards-empty">
+          <div className="empty-icon">🧠</div>
+          <h3>No flashcards yet</h3>
+          <p>Click "Generate" to create flashcards from your document.</p>
         </div>
       )}
     </div>

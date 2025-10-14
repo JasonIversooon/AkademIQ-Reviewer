@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
+import '../styles/AuthPanel.css';
 
 // Vite exposes env variables prefixed with VITE_ via import.meta.env
-const API_BASE = (import.meta.env.VITE_API_BASE as string) || 'http://192.168.0.142:8000';
+const API_BASE = (import.meta.env?.VITE_API_BASE as string) || 'http://192.168.0.142:8000';
 
 interface Props {
   onAuth: (token: string) => void;
@@ -34,10 +35,10 @@ export const AuthPanel: React.FC<Props> = ({ onAuth, token }) => {
   }
 
   return (
-    <div>
-      {token && <p className="status-success">✅ Authenticated</p>}
-      <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
-        <div className="form-group" style={{ flex: 1, minWidth: '200px' }}>
+    <div className="auth-panel">
+      {token && <div className="auth-success">✅ Authenticated</div>}
+      <div className="auth-form">
+        <div className="form-group">
           <input 
             className="form-input" 
             placeholder="Email address" 
@@ -46,7 +47,7 @@ export const AuthPanel: React.FC<Props> = ({ onAuth, token }) => {
             type="email"
           />
         </div>
-        <div className="form-group" style={{ flex: 1, minWidth: '200px' }}>
+        <div className="form-group">
           <input 
             className="form-input" 
             placeholder="Password" 
@@ -55,19 +56,19 @@ export const AuthPanel: React.FC<Props> = ({ onAuth, token }) => {
             onChange={e => setPassword(e.target.value)} 
           />
         </div>
-        <div className="form-group">
+        <div className="form-group select-group">
           <select className="form-select" value={mode} onChange={e => setMode(e.target.value as any)}>
             <option value="register">Register</option>
             <option value="login">Login</option>
           </select>
         </div>
-        <div className="form-group">
+        <div className="form-group button-group">
           <button className="btn btn-primary" disabled={loading} onClick={submit}>
             {loading ? <span className="loading-spinner"></span> : mode}
           </button>
         </div>
       </div>
-      {error && <p className="status-error">❌ {error}</p>}
+      {error && <div className="auth-error">❌ {error}</div>}
     </div>
   );
 };

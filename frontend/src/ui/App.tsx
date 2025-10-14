@@ -6,7 +6,7 @@ import { QuizPage } from '../pages/QuizPage';
 import { FlashcardsPage } from '../pages/FlashcardsPage';
 import { ExplainPage } from '../pages/ExplainPage';
 import { VoicePage } from '../pages/VoicePage';
-import '../styles/App.css';
+import '../styles/base.css';
 
 export const App: React.FC = () => {
   const [token, setToken] = useState<string | null>(null);
