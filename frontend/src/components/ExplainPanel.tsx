@@ -26,16 +26,33 @@ export const ExplainPanel: React.FC<Props> = ({ token, documentId }) => {
   }
 
   return (
-    <section>
-      <h2>Explain</h2>
-      <select value={style} onChange={e => setStyle(e.target.value)}>
-        <option value="layman">Layman</option>
-        <option value="professor">Professor</option>
-        <option value="industry">Industry</option>
-      </select>
-      <button disabled={!documentId || loading} onClick={generate}>Explain</button>
-      {loading && <p>Loading...</p>}
-      {content && <pre style={{ background: '#f5f5f5', padding: '0.75rem', whiteSpace: 'pre-wrap' }}>{content}</pre>}
-    </section>
+    <div>
+      <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
+        <div className="form-group" style={{ margin: 0 }}>
+          <select className="form-select" value={style} onChange={e => setStyle(e.target.value)}>
+            <option value="layman">👥 Layman (Simple explanation)</option>
+            <option value="professor">🎓 Professor (Academic style)</option>
+            <option value="industry">🏢 Industry (Professional context)</option>
+          </select>
+        </div>
+        <button className="btn btn-primary" disabled={!documentId || loading} onClick={generate}>
+          {loading ? <span className="loading-spinner"></span> : '✨ Generate Explanation'}
+        </button>
+      </div>
+
+      {loading && <p className="status-loading">⏳ Generating explanation...</p>}
+      
+      {content && (
+        <div className="explanation-content">
+          <div dangerouslySetInnerHTML={{ __html: content.replace(/\n/g, '<br>') }} />
+        </div>
+      )}
+      
+      {!documentId && (
+        <div style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
+          <p>Upload a document first to generate explanations</p>
+        </div>
+      )}
+    </div>
   );
 };

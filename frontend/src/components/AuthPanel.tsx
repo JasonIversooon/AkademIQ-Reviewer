@@ -34,19 +34,40 @@ export const AuthPanel: React.FC<Props> = ({ onAuth, token }) => {
   }
 
   return (
-    <section>
-      <h2>Auth</h2>
-      {token && <p style={{ color: 'green' }}>Authenticated</p>}
-      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-        <input placeholder="email" value={email} onChange={e => setEmail(e.target.value)} />
-        <input placeholder="password" type="password" value={password} onChange={e => setPassword(e.target.value)} />
-        <select value={mode} onChange={e => setMode(e.target.value as any)}>
-          <option value="register">Register</option>
-          <option value="login">Login</option>
-        </select>
-        <button disabled={loading} onClick={submit}>{loading ? '...' : mode}</button>
+    <div>
+      {token && <p className="status-success">✅ Authenticated</p>}
+      <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
+        <div className="form-group" style={{ flex: 1, minWidth: '200px' }}>
+          <input 
+            className="form-input" 
+            placeholder="Email address" 
+            value={email} 
+            onChange={e => setEmail(e.target.value)} 
+            type="email"
+          />
+        </div>
+        <div className="form-group" style={{ flex: 1, minWidth: '200px' }}>
+          <input 
+            className="form-input" 
+            placeholder="Password" 
+            type="password" 
+            value={password} 
+            onChange={e => setPassword(e.target.value)} 
+          />
+        </div>
+        <div className="form-group">
+          <select className="form-select" value={mode} onChange={e => setMode(e.target.value as any)}>
+            <option value="register">Register</option>
+            <option value="login">Login</option>
+          </select>
+        </div>
+        <div className="form-group">
+          <button className="btn btn-primary" disabled={loading} onClick={submit}>
+            {loading ? <span className="loading-spinner"></span> : mode}
+          </button>
+        </div>
       </div>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-    </section>
+      {error && <p className="status-error">❌ {error}</p>}
+    </div>
   );
 };

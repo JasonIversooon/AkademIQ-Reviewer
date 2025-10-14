@@ -156,155 +156,201 @@ export const QuizPanel: React.FC<Props> = ({ token, documentId }) => {
     const allAnswered = currentQuiz.answers.every(a => a !== -1);
 
     return (
-      <section>
-        <h2>Quiz - {difficulty.toUpperCase()}</h2>
-        <div style={{ marginBottom: '1rem' }}>
-          <strong>Question {currentQuiz.currentQuestion + 1} of {currentQuiz.questions.length}</strong>
-          <div style={{ background: '#f0f0f0', height: '8px', borderRadius: '4px', marginTop: '0.5rem' }}>
-            <div 
-              style={{ 
-                background: '#007bff', 
-                height: '100%', 
-                width: `${((currentQuiz.currentQuestion + 1) / currentQuiz.questions.length) * 100}%`,
-                borderRadius: '4px',
-                transition: 'width 0.3s ease'
-              }}
-            />
+      <div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+          <h3 style={{ margin: 0, color: '#4a5568' }}>Quiz - {difficulty.toUpperCase()}</h3>
+          <div style={{ fontSize: '0.9rem', color: '#666' }}>
+            Question {currentQuiz.currentQuestion + 1} of {currentQuiz.questions.length}
           </div>
         </div>
         
-        <div style={{ marginBottom: '2rem' }}>
-          <h3>{question.question}</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+        <div className="quiz-progress">
+          <div 
+            className="quiz-progress-bar"
+            style={{ width: `${((currentQuiz.currentQuestion + 1) / currentQuiz.questions.length) * 100}%` }}
+          />
+        </div>
+        
+        <div className="quiz-question">
+          <h3 style={{ marginBottom: '1.5rem', color: '#2d3748' }}>{question.question}</h3>
+          <div className="quiz-options">
             {question.options.map((option, index) => (
-              <button
+              <div
                 key={index}
+                className={`quiz-option ${currentQuiz.answers[currentQuiz.currentQuestion] === index ? 'selected' : ''}`}
                 onClick={() => selectAnswer(index)}
-                style={{
-                  padding: '1rem',
-                  textAlign: 'left',
-                  border: '2px solid #ddd',
-                  borderRadius: '8px',
-                  background: currentQuiz.answers[currentQuiz.currentQuestion] === index ? '#e3f2fd' : 'white',
-                  borderColor: currentQuiz.answers[currentQuiz.currentQuestion] === index ? '#2196f3' : '#ddd',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease'
-                }}
               >
                 <strong>{String.fromCharCode(65 + index)}.</strong> {option}
-              </button>
+              </div>
             ))}
           </div>
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2rem' }}>
           <button 
+            className="btn btn-secondary"
             onClick={prevQuestion} 
             disabled={currentQuiz.currentQuestion === 0}
-            style={{ opacity: currentQuiz.currentQuestion === 0 ? 0.5 : 1 }}
           >
-            Previous
+            ← Previous
           </button>
           
           <div style={{ display: 'flex', gap: '0.5rem' }}>
             {isLastQuestion && allAnswered ? (
               <button 
+                className="btn btn-primary"
                 onClick={submitQuiz} 
                 disabled={loading}
-                style={{ background: '#4caf50', color: 'white', padding: '0.5rem 1rem', borderRadius: '4px', border: 'none' }}
               >
-                {loading ? 'Submitting...' : 'Submit Quiz'}
+                {loading ? <span className="loading-spinner"></span> : '✓ Submit Quiz'}
               </button>
             ) : (
               <button 
+                className="btn btn-primary"
                 onClick={nextQuestion} 
                 disabled={!isAnswered || isLastQuestion}
-                style={{ opacity: !isAnswered || isLastQuestion ? 0.5 : 1 }}
               >
-                Next
+                Next →
               </button>
             )}
           </div>
         </div>
 
-        {error && <p style={{ color: 'red', marginTop: '1rem' }}>{error}</p>}
-      </section>
+        {error && <p className="status-error">❌ {error}</p>}
+      </div>
     );
   }
 
   if (quizState === 'completed' && quizResults) {
+    const getScoreColor = (percentage: number) => {
+      if (percentage >= 80) return '#38a169';
+      if (percentage >= 60) return '#ed8936';
+      return '#e53e3e';
+    };
+
+    const getScoreEmoji = (percentage: number) => {
+      if (percentage >= 80) return '🎉';
+      if (percentage >= 60) return '👍';
+      return '📚';
+    };
+
     return (
-      <section>
-        <h2>Quiz Results</h2>
-        <div style={{ marginBottom: '2rem', padding: '1rem', background: '#f8f9fa', borderRadius: '8px' }}>
-          <h3>Score: {quizResults.score}/{quizResults.total_questions} ({quizResults.percentage.toFixed(1)}%)</h3>
+      <div>
+        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+          <h3 style={{ color: '#2d3748', marginBottom: '1rem' }}>Quiz Complete!</h3>
           <div style={{ 
-            background: quizResults.percentage >= 70 ? '#4caf50' : quizResults.percentage >= 50 ? '#ff9800' : '#f44336',
-            color: 'white',
-            padding: '0.5rem',
-            borderRadius: '4px',
-            textAlign: 'center',
-            marginTop: '0.5rem'
+            background: 'white',
+            border: `3px solid ${getScoreColor(quizResults.percentage)}`,
+            borderRadius: '16px',
+            padding: '2rem',
+            display: 'inline-block',
+            minWidth: '200px'
           }}>
-            {quizResults.percentage >= 70 ? '🎉 Great job!' : quizResults.percentage >= 50 ? '👍 Good effort!' : '📚 Keep studying!'}
+            <div style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>
+              {getScoreEmoji(quizResults.percentage)}
+            </div>
+            <div style={{ fontSize: '2rem', fontWeight: 'bold', color: getScoreColor(quizResults.percentage) }}>
+              {quizResults.score}/{quizResults.total_questions}
+            </div>
+            <div style={{ fontSize: '1.2rem', color: '#666' }}>
+              {quizResults.percentage.toFixed(1)}%
+            </div>
+            <div style={{ 
+              background: getScoreColor(quizResults.percentage),
+              color: 'white',
+              padding: '0.5rem 1rem',
+              borderRadius: '8px',
+              marginTop: '1rem',
+              fontSize: '0.9rem'
+            }}>
+              {quizResults.percentage >= 80 ? 'Excellent!' : 
+               quizResults.percentage >= 60 ? 'Good job!' : 
+               'Keep studying!'}
+            </div>
           </div>
         </div>
 
         <div style={{ marginBottom: '2rem' }}>
-          <h4>Review Questions:</h4>
-          {quizResults.results.map((result, index) => (
-            <div 
-              key={result.question_id} 
-              style={{ 
-                margin: '1rem 0', 
-                padding: '1rem', 
-                border: `2px solid ${result.is_correct ? '#4caf50' : '#f44336'}`,
-                borderRadius: '8px',
-                background: result.is_correct ? '#f1f8e9' : '#ffebee'
-              }}
-            >
-              <p><strong>Q{index + 1}: {result.question}</strong></p>
-              <p>Your answer: <strong>{String.fromCharCode(65 + result.user_answer)}</strong></p>
-              {!result.is_correct && (
-                <p>Correct answer: <strong>{String.fromCharCode(65 + result.correct_answer)}</strong></p>
-              )}
-              <p><em>{result.explanation}</em></p>
-            </div>
-          ))}
+          <h4 style={{ marginBottom: '1rem', color: '#4a5568' }}>📝 Review Questions:</h4>
+          <div className="card-list">
+            {quizResults.results.map((result, index) => (
+              <div 
+                key={result.question_id} 
+                className="card"
+                style={{ 
+                  borderLeft: `4px solid ${result.is_correct ? '#38a169' : '#e53e3e'}`,
+                  background: result.is_correct ? '#f0fff4' : '#fff5f5'
+                }}
+              >
+                <div className="card-title">
+                  {result.is_correct ? '✅' : '❌'} Q{index + 1}: {result.question}
+                </div>
+                <div className="card-content">
+                  <p><strong>Your answer:</strong> {String.fromCharCode(65 + result.user_answer)}</p>
+                  {!result.is_correct && (
+                    <p><strong>Correct answer:</strong> {String.fromCharCode(65 + result.correct_answer)}</p>
+                  )}
+                  <p style={{ marginTop: '0.5rem', fontStyle: 'italic', color: '#666' }}>
+                    {result.explanation}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
-        <button onClick={resetQuiz} style={{ background: '#2196f3', color: 'white', padding: '0.5rem 1rem', borderRadius: '4px', border: 'none' }}>
-          Take Another Quiz
-        </button>
-      </section>
+        <div style={{ textAlign: 'center' }}>
+          <button className="btn btn-primary" onClick={resetQuiz}>
+            🔄 Take Another Quiz
+          </button>
+        </div>
+      </div>
     );
   }
 
   // Initial state - quiz generation
   return (
-    <section>
-      <h2>Quiz</h2>
-      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '1rem' }}>
-        <select value={difficulty} onChange={e => setDifficulty(e.target.value)}>
-          <option value="easy">Easy ({getQuestionCount('easy')} questions)</option>
-          <option value="medium">Medium ({getQuestionCount('medium')} questions)</option>
-          <option value="hard">Hard ({getQuestionCount('hard')} questions)</option>
-        </select>
-        <button disabled={!documentId || loading} onClick={generateQuiz}>
-          {loading ? 'Generating...' : 'Start Quiz'}
+    <div>
+      <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
+        <div className="form-group" style={{ margin: 0 }}>
+          <select className="form-select" value={difficulty} onChange={e => setDifficulty(e.target.value)}>
+            <option value="easy">Easy ({getQuestionCount('easy')} questions)</option>
+            <option value="medium">Medium ({getQuestionCount('medium')} questions)</option>
+            <option value="hard">Hard ({getQuestionCount('hard')} questions)</option>
+          </select>
+        </div>
+        <button className="btn btn-primary" disabled={!documentId || loading} onClick={generateQuiz}>
+          {loading ? <span className="loading-spinner"></span> : '🚀 Start Quiz'}
         </button>
       </div>
       
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {error && <p className="status-error">❌ {error}</p>}
       
-      <div style={{ fontSize: '0.9rem', color: '#666', marginTop: '1rem' }}>
-        <p><strong>Quiz Difficulty:</strong></p>
-        <ul>
-          <li><strong>Easy:</strong> Basic definitions and simple facts (8 questions)</li>
-          <li><strong>Medium:</strong> Conceptual understanding and applications (12 questions)</li>
-          <li><strong>Hard:</strong> Analysis, synthesis, and complex scenarios (15 questions)</li>
-        </ul>
+      <div className="card" style={{ marginTop: '1rem' }}>
+        <div className="card-title">📚 Quiz Difficulty Levels</div>
+        <div className="card-content">
+          <div style={{ display: 'grid', gap: '0.75rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span style={{ background: '#68d391', color: 'white', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 'bold' }}>E</span>
+              <span><strong>Easy:</strong> Basic definitions and simple facts (8 questions)</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span style={{ background: '#f6ad55', color: 'white', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 'bold' }}>M</span>
+              <span><strong>Medium:</strong> Conceptual understanding and applications (12 questions)</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span style={{ background: '#fc8181', color: 'white', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 'bold' }}>H</span>
+              <span><strong>Hard:</strong> Analysis, synthesis, and complex scenarios (15 questions)</span>
+            </div>
+          </div>
+        </div>
       </div>
-    </section>
+      
+      {!documentId && (
+        <div style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
+          <p>Upload a document first to generate quizzes</p>
+        </div>
+      )}
+    </div>
   );
 };

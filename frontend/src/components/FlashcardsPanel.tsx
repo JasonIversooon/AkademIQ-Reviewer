@@ -45,27 +45,50 @@ export const FlashcardsPanel: React.FC<Props> = ({ token, documentId }) => {
   }
 
   return (
-    <section>
-      <h2>Flashcards</h2>
-      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
-        <select value={difficulty} onChange={e => setDifficulty(e.target.value)}>
-          <option value="easy">Easy</option>
-          <option value="medium">Medium</option>
-          <option value="hard">Hard</option>
-        </select>
-        <button disabled={!documentId || loading} onClick={generate}>Generate</button>
-        <button disabled={!documentId} onClick={refresh}>Refresh</button>
+    <div>
+      <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
+        <div className="form-group" style={{ margin: 0 }}>
+          <select className="form-select" value={difficulty} onChange={e => setDifficulty(e.target.value)}>
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+          </select>
+        </div>
+        <button className="btn btn-primary" disabled={!documentId || loading} onClick={generate}>
+          {loading ? <span className="loading-spinner"></span> : 'Generate'}
+        </button>
+        <button className="btn btn-secondary" disabled={!documentId} onClick={refresh}>
+          Refresh
+        </button>
       </div>
-      {loading && <p>Generating...</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <ul>
-        {cards.map(c => (
-          <li key={c.id} style={{ marginBottom: '0.5rem' }}>
-            <strong>{c.question}</strong><br />
-            <em>{c.answer}</em>
-          </li>
-        ))}
-      </ul>
-    </section>
+      
+      {loading && <p className="status-loading">⏳ Generating flashcards...</p>}
+      {error && <p className="status-error">❌ {error}</p>}
+      
+      {cards.length > 0 && (
+        <div className="card-list">
+          {cards.map(c => (
+            <div key={c.id} className={`flashcard ${c.status}`}>
+              <div className="flashcard-question">{c.question}</div>
+              <div className="flashcard-answer">{c.answer}</div>
+              <div className="flashcard-actions">
+                <button className={`flashcard-btn ${c.status === 'mastered' ? 'mastered' : 'new'}`}>
+                  {c.status === 'mastered' ? '✅ Mastered' : '📚 Study'}
+                </button>
+                <button className={`flashcard-btn ${c.status === 'later' ? 'later' : 'new'}`}>
+                  {c.status === 'later' ? '⏰ Later' : '⏰ Study Later'}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+      
+      {!loading && cards.length === 0 && documentId && (
+        <div style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
+          <p>No flashcards generated yet. Click "Generate" to create flashcards from your document.</p>
+        </div>
+      )}
+    </div>
   );
 };
