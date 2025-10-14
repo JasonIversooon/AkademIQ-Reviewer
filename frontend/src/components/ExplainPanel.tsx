@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 
+const API_BASE = (import.meta.env.VITE_API_BASE as string) || 'http://192.168.0.142:8000';
+
 interface Props {
   token: string | null;
   documentId: string | null;
@@ -13,7 +15,7 @@ export const ExplainPanel: React.FC<Props> = ({ token, documentId }) => {
   async function generate() {
     if (!documentId) return;
     setLoading(true);
-    const res = await fetch(`http://127.0.0.1:8000/documents/${documentId}/explain`, {
+    const res = await fetch(`${API_BASE}/documents/${documentId}/explain`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ style })

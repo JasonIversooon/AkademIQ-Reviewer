@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 
+const API_BASE = (import.meta.env.VITE_API_BASE as string) || 'http://192.168.0.142:8000';
+
 interface Props {
   token: string | null;
   documentId: string | null;
@@ -21,7 +23,7 @@ export const FlashcardsPanel: React.FC<Props> = ({ token, documentId }) => {
     if (!documentId) return;
     setLoading(true); setError(null);
     try {
-      const res = await fetch(`http://127.0.0.1:8000/documents/${documentId}/flashcards/generate`, {
+      const res = await fetch(`${API_BASE}/documents/${documentId}/flashcards/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ count: 8 })
@@ -36,7 +38,7 @@ export const FlashcardsPanel: React.FC<Props> = ({ token, documentId }) => {
 
   async function refresh() {
     if (!documentId) return;
-    const res = await fetch(`http://127.0.0.1:8000/documents/${documentId}/flashcards`);
+  const res = await fetch(`${API_BASE}/documents/${documentId}/flashcards`);
     const data = await res.json();
     if (res.ok) setCards(data.flashcards);
   }

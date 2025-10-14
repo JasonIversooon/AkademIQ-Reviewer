@@ -1,17 +1,30 @@
+from dotenv import load_dotenv  # ensure .env is loaded before app imports
+load_dotenv()  # load environment variables early
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware  # added
 from app.api import auth, documents
-from dotenv import load_dotenv  # added
+import logging
 
-load_dotenv()  # added to load .env before settings are accessed
+# Basic logging config for debugging during development
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
+)
+# Make sure uvicorn logs propagate to the root logger
+logging.getLogger("uvicorn").propagate = True
+
 
 app = FastAPI(title="AcademIQ Reviewer API")
 
 # allow explicit dev origins (include your LAN IP origin)
 origins = [
     "http://localhost:5173",
-    "http://127.0.0.1:5173", 
-    "http://192.168.100.25:5173",
+    "http://localhost:5174",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:5174", 
+    "http://192.168.0.142:5173",
+    "http://192.168.0.142:5174",
 ]
 
 app.add_middleware(

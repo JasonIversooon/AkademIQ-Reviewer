@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 
+const API_BASE = (import.meta.env.VITE_API_BASE as string) || 'http://192.168.0.142:8000';
+
 interface Props {
   token: string | null;
   onUploaded: (id: string) => void;
@@ -14,7 +16,7 @@ export const UploadPanel: React.FC<Props> = ({ token, onUploaded }) => {
     setStatus('Uploading...');
     const fd = new FormData();
     fd.append('file', file);
-    const res = await fetch('http://127.0.0.1:8000/documents/upload', {
+    const res = await fetch(`${API_BASE}/documents/upload`, {
       method: 'POST',
       headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       body: fd

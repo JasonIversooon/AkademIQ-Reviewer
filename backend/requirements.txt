@@ -1,11 +1,11 @@
 fastapi==0.110.0
 uvicorn[standard]==0.30.0
 python-dotenv==1.0.0
-# Use httpx 0.25.x to satisfy supabase (supabase 2.4.0 requires httpx <0.26)
-httpx==0.25.1
+httpx==0.24.1
 PyPDF2==3.0.0
-supabase==2.4.0
-pydantic==2.7.0
+supabase==2.1.0
+pydantic==2.12.1
+pydantic[email]
 python-multipart==0.0.9
 groq==0.6.0
 python-decouple==3.8
