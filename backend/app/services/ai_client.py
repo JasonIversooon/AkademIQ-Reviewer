@@ -3,7 +3,7 @@ import httpx
 import json
 import logging
 from groq import AsyncGroq, GroqError
-from app.utils.prompts import FLASHCARD_PROMPT_TEMPLATE, EXPLANATION_PROMPT_TEMPLATE
+from app.utils.prompts import FLASHCARD_PROMPT_TEMPLATE, EXPLANATION_PROMPT_TEMPLATE, PODCAST_PROMPT_TEMPLATE
 
 logger = logging.getLogger("ai_client")
 
@@ -154,3 +154,8 @@ async def _chat(prompt: str, max_tokens: int = 1800, temperature: float = 0.6) -
     except Exception as e:
         logger.error(f"Unexpected AI error: {e}")
         return "[ERROR] AI unavailable."
+
+
+async def generate_text(prompt: str, max_tokens: int = 1800, temperature: float = 0.7) -> str:
+    """Generate text using the same AI client as other features"""
+    return await _chat(prompt, max_tokens=max_tokens, temperature=temperature)

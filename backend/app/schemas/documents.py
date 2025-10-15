@@ -52,3 +52,17 @@ class QuizResultResponse(BaseModel):
     total_questions: int
     percentage: float
     results: List[dict]  # Question results with correct/incorrect info
+
+class PodcastDialogueLine(BaseModel):
+    speaker: int  # 1 or 2
+    text: str
+
+class PodcastGenerationRequest(BaseModel):
+    voice_option: str  # "male-male", "female-female", "male-female"
+
+class PodcastScript(BaseModel):
+    id: str
+    speaker1: str
+    speaker2: str
+    dialogue: List[PodcastDialogueLine]
+    audio_url: str | None = None

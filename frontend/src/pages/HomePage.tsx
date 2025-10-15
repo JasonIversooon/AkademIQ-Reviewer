@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UploadPanel } from '../components/UploadPanel';
+import { FloatingTimer } from '../components/FloatingTimer';
 import '../styles/HomePage.css';
 
 interface Props {
@@ -11,7 +12,6 @@ interface Props {
 export const HomePage: React.FC<Props> = ({ token, onLogout }) => {
   const navigate = useNavigate();
   const [documentId, setDocumentId] = useState<string | null>(null);
-  const [showPreview, setShowPreview] = useState(false);
 
   const features = [
     {
@@ -40,9 +40,9 @@ export const HomePage: React.FC<Props> = ({ token, onLogout }) => {
     },
     {
       id: 'voice',
-      title: 'Read with Voices',
-      description: 'Listen to your documents with AI-generated audio',
-      icon: '🎵',
+      title: 'AI Podcast',
+      description: 'Generate conversational podcasts from your documents',
+      icon: '�️',
       color: '#43e97b',
       path: '/voice'
     }
@@ -93,35 +93,9 @@ export const HomePage: React.FC<Props> = ({ token, onLogout }) => {
               token={token} 
               onUploaded={(id) => {
                 setDocumentId(id);
-                setShowPreview(true);
               }} 
             />
           </div>
-
-          {/* Preview Section */}
-          {documentId && (
-            <div className="preview-section">
-              <div className="preview-header">
-                <h4>📄 Document Preview</h4>
-                <button 
-                  className="preview-toggle"
-                  onClick={() => setShowPreview(!showPreview)}
-                >
-                  {showPreview ? '▼ Hide' : '▶ Show'}
-                </button>
-              </div>
-              
-              {showPreview && (
-                <div className="preview-content">
-                  <div className="preview-placeholder">
-                    <p>✅ Document uploaded successfully!</p>
-                    <p><strong>Document ID:</strong> {documentId}</p>
-                    <p>Ready to generate study materials →</p>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
         </div>
 
         {/* Right Side - Features */}
@@ -160,22 +134,11 @@ export const HomePage: React.FC<Props> = ({ token, onLogout }) => {
               </div>
             )}
           </div>
-
-          {/* Timer Section (Future Feature) */}
-          <div className="timer-section">
-            <div className="section-header">
-              <h4>⏰ Study Timer</h4>
-              <p>Pomodoro-style study sessions (Coming Soon)</p>
-            </div>
-            <div className="timer-placeholder">
-              <div className="timer-circle">
-                <span>25:00</span>
-              </div>
-              <p>Set intervals and track your study time</p>
-            </div>
-          </div>
         </div>
       </div>
+
+      {/* Floating Timer */}
+      <FloatingTimer />
     </div>
   );
 };

@@ -58,3 +58,28 @@ Example output:
 
 SOURCE:
 \"\"\"{text}\"\"\""""
+
+PODCAST_PROMPT_TEMPLATE = """Create a SHORT podcast script between two speakers discussing the following document content. 
+The conversation should be CONCISE and informative, like a brief podcast summary.
+
+Speaker 1: {speaker1}
+Speaker 2: {speaker2}
+
+Create a natural but BRIEF conversation that:
+1. Introduces the topic warmly (1-2 lines)
+2. Discusses 2-3 key points from the document
+3. Provides quick insights and takeaways
+4. Concludes with summary (1-2 lines)
+
+IMPORTANT: Keep it SHORT - aim for 6-10 exchanges total, each response should be 1-2 sentences maximum.
+This is for a personal project and should be concise to save tokens.
+
+Format the response as dialogue lines. Each line should start with the speaker name followed by a colon.
+Example:
+{speaker1}: Welcome! Today we're discussing [main topic].
+{speaker2}: Thanks {speaker1}! The key insight here is [brief point].
+
+Keep individual responses SHORT and conversational.
+
+SOURCE:
+\"\"\"{text}\"\"\""""

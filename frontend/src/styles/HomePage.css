@@ -62,8 +62,7 @@
   gap: 1.5rem;
 }
 
-.upload-section,
-.preview-section {
+.upload-section {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   border-radius: 16px;
@@ -87,41 +86,6 @@
 .section-header p {
   color: #666;
   font-size: 0.9rem;
-}
-
-.preview-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.preview-toggle {
-  background: none;
-  border: none;
-  color: #667eea;
-  cursor: pointer;
-  font-weight: 500;
-  padding: 0.5rem;
-  border-radius: 4px;
-  transition: background 0.2s ease;
-}
-
-.preview-toggle:hover {
-  background: rgba(102, 126, 234, 0.1);
-}
-
-.preview-content {
-  border: 2px dashed #e2e8f0;
-  border-radius: 8px;
-  padding: 2rem;
-  text-align: center;
-  color: #666;
-  background: #fafafa;
-}
-
-.preview-placeholder p {
-  margin-bottom: 0.5rem;
 }
 
 .home-right {
@@ -254,7 +218,6 @@
   }
   
   .upload-section,
-  .preview-section,
   .features-section,
   .timer-section {
     padding: 1rem;
