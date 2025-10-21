@@ -6,6 +6,10 @@ import logging
 import tempfile
 from pathlib import Path
 from groq import Groq
+from app.core.supabase_client import get_supabase
+import base64
+from datetime import datetime
+import uuid
 from app.core.config import get_settings
 
 logger = logging.getLogger("app.services.tts_client")
@@ -110,7 +114,8 @@ async def generate_speech(
 async def generate_podcast_audio(
     dialogue_lines: list[dict],
     voice_option: str = "male-female",
-    output_dir: str | None = None
+    output_dir: str | None = None,
+    script_id: str | None = None
 ) -> list[dict]:
     """
     Generate audio for each dialogue line in a podcast script
@@ -139,6 +144,12 @@ async def generate_podcast_audio(
     
     audio_results = []
     
+    supabase = None
+    try:
+        supabase = get_supabase()
+    except Exception:
+        supabase = None
+
     for i, line in enumerate(dialogue_lines):
         speaker = line.get("speaker", 1)
         text = line.get("text", "")
@@ -176,6 +187,24 @@ async def generate_podcast_audio(
                 
                 result["audio_path"] = str(filepath)
                 logger.info(f"Saved audio to {filepath}")
+
+            # Also attempt to store audio in Supabase table `podcast_audios` as base64
+            if supabase is not None:
+                try:
+                    audio_b64 = base64.b64encode(audio_bytes).decode('utf-8')
+                    record = {
+                        "id": str(uuid.uuid4()),
+                        "script_id": script_id,
+                        "line_index": i,
+                        "speaker": speaker,
+                        "audio_base64": audio_b64,
+                        "created_at": "now()"
+                    }
+                    # Insert without id/script_id if not provided; callers may update script_id later
+                    supabase.table("podcast_audios").insert(record).execute()
+                    logger.info("Stored audio bytes to Supabase podcast_audios table")
+                except Exception as e:
+                    logger.warning(f"Failed to store audio to Supabase: {e}")
             
             audio_results.append(result)
             

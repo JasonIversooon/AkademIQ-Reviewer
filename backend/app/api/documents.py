@@ -509,11 +509,13 @@ async def generate_podcast_audio(
         output_dir = None
         if request.save_to_disk:
             output_dir = f"./audio_output/{script_id}"
-        
+
+        # Pass script_id so tts client can store audio in DB
         audio_results = await tts_generate(
             dialogue_lines=dialogue,
             voice_option=voice_option,
-            output_dir=output_dir
+            output_dir=output_dir,
+            script_id=script_id
         )
         
         # Convert results to response schema
@@ -567,27 +569,55 @@ async def generate_podcast_audio(
 @router.get("/audio/stream/{script_id}/{line_index}")
 async def stream_audio_line(script_id: str, line_index: int):
     """Stream a specific audio line from a podcast script"""
+    # First try to stream audio from Supabase podcast_audios table
+    supabase = get_supabase()
+    try:
+        resp = supabase.table("podcast_audios")\
+            .select("audio_base64, created_at")\
+            .eq("script_id", script_id)\
+            .eq("line_index", line_index)\
+            .order("created_at", desc=False)\
+            .execute()
+
+        if resp.data and len(resp.data) > 0:
+            audio_b64 = resp.data[0].get("audio_base64")
+            if audio_b64:
+                audio_bytes = base64.b64decode(audio_b64)
+                return Response(
+                    content=audio_bytes,
+                    media_type="audio/wav",
+                    headers={
+                        "Content-Disposition": f"inline; filename=line_{line_index}.wav",
+                        "Accept-Ranges": "bytes",
+                        "Cache-Control": "public, max-age=3600"
+                    }
+                )
+    except Exception:
+        # Fall through to disk fallback
+        pass
+
+    # Fallback: stream from disk (legacy)
     from pathlib import Path
     import glob
-    
+
     # Construct the audio file path pattern
     audio_pattern = f"./audio_output/{script_id}/line_{line_index:03d}_speaker*.wav"
-    
+
     # Find matching files (handles speaker1 or speaker2)
     matching_files = glob.glob(audio_pattern)
-    
+
     if not matching_files:
         raise HTTPException(status_code=404, detail="Audio file not found")
-    
+
     audio_file = Path(matching_files[0])
-    
+
     if not audio_file.exists():
         raise HTTPException(status_code=404, detail="Audio file not found")
-    
+
     try:
         with open(audio_file, "rb") as f:
             audio_bytes = f.read()
-        
+
         return Response(
             content=audio_bytes,
             media_type="audio/wav",
@@ -599,3 +629,29 @@ async def stream_audio_line(script_id: str, line_index: int):
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to read audio file: {str(e)}")
+
+
+@router.post("/podcast/cleanup")
+async def cleanup_podcast_audio():
+    """Delete podcast audio records older than 3 days from Supabase storage table"""
+    supabase = get_supabase()
+    try:
+        from datetime import datetime, timedelta
+        three_days_ago = datetime.utcnow() - timedelta(days=3)
+        three_days_ago_str = three_days_ago.isoformat()
+
+        # Query records older than 3 days
+        old_resp = supabase.table("podcast_audios")\
+            .select("id")\
+            .lt("created_at", three_days_ago_str)\
+            .execute()
+
+        if old_resp.data:
+            ids = [r["id"] for r in old_resp.data if r.get("id")]
+            if ids:
+                supabase.table("podcast_audios").delete().in_("id", ids).execute()
+                return {"deleted": len(ids), "ids": ids}
+
+        return {"deleted": 0, "ids": []}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Cleanup failed: {str(e)}")
