@@ -17,19 +17,10 @@ logging.getLogger("uvicorn").propagate = True
 
 app = FastAPI(title="AcademIQ Reviewer API")
 
-# allow explicit dev origins (include your LAN IP origin)
-origins = [
-    "http://localhost:5173",
-    "http://localhost:5174",
-    "http://127.0.0.1:5173",
-    "http://127.0.0.1:5174", 
-    "http://192.168.0.142:5173",
-    "http://192.168.0.142:5174",
-]
-
+# Allow all origins for development
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

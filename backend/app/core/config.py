@@ -9,6 +9,7 @@ class Settings(BaseModel):
     openai_api_key: str | None = None  # legacy (unused now)
     groq_api_key: str | None = None    # added
     ai_model: str = "openai/gpt-oss-20b"
+    tts_model: str = "playai-tts"      # TTS model
     max_pdf_pages: int = 15
 
     class Config:
@@ -23,5 +24,6 @@ def get_settings() -> Settings:
         openai_api_key=os.getenv("OPENAI_API_KEY"),
         groq_api_key=os.getenv("GROQ_API_KEY"),  # added
         ai_model=os.getenv("AI_MODEL", "openai/gpt-oss-20b"),
+        tts_model=os.getenv("TTS_MODEL", "playai-tts"),
         max_pdf_pages=int(os.getenv("MAX_PDF_PAGES", "15")),
     )

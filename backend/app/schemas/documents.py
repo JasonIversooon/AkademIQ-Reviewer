@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Any
 
 class DocumentUploadResponse(BaseModel):
     document_id: str
@@ -66,3 +66,23 @@ class PodcastScript(BaseModel):
     speaker2: str
     dialogue: List[PodcastDialogueLine]
     audio_url: str | None = None
+
+class PodcastAudioGenerationRequest(BaseModel):
+    save_to_disk: bool = False  # Whether to save individual audio files to disk
+
+class PodcastAudioLine(BaseModel):
+    index: int
+    speaker: int
+    text: str
+    voice: str
+    audio_size: int
+    audio_path: str | None = None
+    error: str | None = None
+
+class PodcastAudioResponse(BaseModel):
+    script_id: str
+    total_lines: int
+    generated_count: int
+    failed_count: int
+    audio_lines: List[PodcastAudioLine]
+    combined_audio_url: str | None = None  # For future: combined audio file

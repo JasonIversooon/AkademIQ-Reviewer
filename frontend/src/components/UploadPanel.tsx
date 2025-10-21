@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { API_BASE } from '../config';
 import '../styles/UploadPanel.css';
-
-const API_BASE = (import.meta.env?.VITE_API_BASE as string) || 'http://192.168.0.146:8000';
 
 interface Props {
   token: string | null;

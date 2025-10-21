@@ -18,6 +18,9 @@ from app.schemas.documents import (
     PodcastGenerationRequest,
     PodcastScript,
     PodcastDialogueLine,
+    PodcastAudioGenerationRequest,
+    PodcastAudioResponse,
+    PodcastAudioLine,
 )
 from app.services import ai_client
 from app.core.supabase_client import get_supabase
@@ -468,3 +471,131 @@ async def generate_podcast(
     except Exception as e:
         print(f"Error generating podcast: {e}")
         raise HTTPException(status_code=500, detail="Failed to generate podcast script")
+
+
+@router.post("/podcast/{script_id}/generate-audio", response_model=PodcastAudioResponse)
+async def generate_podcast_audio(
+    script_id: str,
+    request: PodcastAudioGenerationRequest,
+    authorization: str | None = Header(default=None)
+):
+    """Generate TTS audio for a podcast script"""
+    token = get_user_token(authorization)
+    if not token:
+        raise HTTPException(status_code=401, detail="Authentication required")
+    
+    supabase = get_supabase()
+    
+    # Get the podcast script
+    try:
+        script_response = supabase.table("podcast_scripts").select("*").eq("id", script_id).execute()
+        if not script_response.data:
+            raise HTTPException(status_code=404, detail="Podcast script not found")
+    except Exception as e:
+        if "could not find" in str(e).lower() or "does not exist" in str(e).lower():
+            # Table doesn't exist yet - handle gracefully
+            raise HTTPException(status_code=404, detail="Podcast scripts feature not yet configured")
+        raise HTTPException(status_code=404, detail="Podcast script not found")
+    
+    script = script_response.data[0]
+    dialogue = script["dialogue"]
+    voice_option = script.get("voice_option", "male-female")
+    
+    # Generate audio using TTS service
+    from app.services.tts_client import generate_podcast_audio as tts_generate
+    
+    try:
+        # Set output directory if saving to disk
+        output_dir = None
+        if request.save_to_disk:
+            output_dir = f"./audio_output/{script_id}"
+        
+        audio_results = await tts_generate(
+            dialogue_lines=dialogue,
+            voice_option=voice_option,
+            output_dir=output_dir
+        )
+        
+        # Convert results to response schema
+        audio_lines = []
+        generated_count = 0
+        failed_count = 0
+        
+        for result in audio_results:
+            if "error" in result:
+                failed_count += 1
+            else:
+                generated_count += 1
+            
+            # Don't include audio_bytes in response (too large)
+            audio_lines.append(PodcastAudioLine(
+                index=result["index"],
+                speaker=result["speaker"],
+                text=result["text"],
+                voice=result.get("voice", "unknown"),
+                audio_size=result.get("audio_size", 0),
+                audio_path=result.get("audio_path"),
+                error=result.get("error")
+            ))
+        
+        # Store audio generation record (optional)
+        try:
+            supabase.table("podcast_audio_generations").insert({
+                "id": str(uuid.uuid4()),
+                "script_id": script_id,
+                "generated_count": generated_count,
+                "failed_count": failed_count,
+                "created_at": "now()"
+            }).execute()
+        except:
+            pass  # Table may not exist
+        
+        return PodcastAudioResponse(
+            script_id=script_id,
+            total_lines=len(dialogue),
+            generated_count=generated_count,
+            failed_count=failed_count,
+            audio_lines=audio_lines,
+            combined_audio_url=None  # Future: combine all audio files
+        )
+        
+    except Exception as e:
+        print(f"Error generating TTS audio: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to generate audio: {str(e)}")
+
+
+@router.get("/audio/stream/{script_id}/{line_index}")
+async def stream_audio_line(script_id: str, line_index: int):
+    """Stream a specific audio line from a podcast script"""
+    from pathlib import Path
+    import glob
+    
+    # Construct the audio file path pattern
+    audio_pattern = f"./audio_output/{script_id}/line_{line_index:03d}_speaker*.wav"
+    
+    # Find matching files (handles speaker1 or speaker2)
+    matching_files = glob.glob(audio_pattern)
+    
+    if not matching_files:
+        raise HTTPException(status_code=404, detail="Audio file not found")
+    
+    audio_file = Path(matching_files[0])
+    
+    if not audio_file.exists():
+        raise HTTPException(status_code=404, detail="Audio file not found")
+    
+    try:
+        with open(audio_file, "rb") as f:
+            audio_bytes = f.read()
+        
+        return Response(
+            content=audio_bytes,
+            media_type="audio/wav",
+            headers={
+                "Content-Disposition": f"inline; filename=line_{line_index}.wav",
+                "Accept-Ranges": "bytes",
+                "Cache-Control": "public, max-age=3600"
+            }
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to read audio file: {str(e)}")

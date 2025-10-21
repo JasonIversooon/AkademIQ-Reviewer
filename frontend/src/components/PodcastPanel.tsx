@@ -1,8 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { API_BASE } from '../config';
 import '../styles/PodcastPanel.css';
-
-// Use same API base as other components
-const API_BASE = 'http://localhost:8000';
 
 interface PodcastPanelProps {
   token: string;
@@ -20,6 +18,25 @@ interface PodcastScript {
   audioUrl?: string;
 }
 
+interface AudioLine {
+  index: number;
+  speaker: number;
+  text: string;
+  voice: string;
+  audio_size: number;
+  audio_path?: string;
+  error?: string;
+}
+
+interface AudioGenerationResponse {
+  script_id: string;
+  total_lines: number;
+  generated_count: number;
+  failed_count: number;
+  audio_lines: AudioLine[];
+  combined_audio_url?: string;
+}
+
 export const PodcastPanel: React.FC<PodcastPanelProps> = ({ token, documentId }) => {
   const [script, setScript] = useState<PodcastScript | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -28,6 +45,9 @@ export const PodcastPanel: React.FC<PodcastPanelProps> = ({ token, documentId })
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [audioLines, setAudioLines] = useState<AudioLine[]>([]);
+  const [currentLineIndex, setCurrentLineIndex] = useState<number>(0);
+  const [audioGenerationProgress, setAudioGenerationProgress] = useState<string>('');
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const generateScript = async () => {
@@ -64,33 +84,52 @@ export const PodcastPanel: React.FC<PodcastPanelProps> = ({ token, documentId })
     if (!script) return;
     
     setIsGeneratingAudio(true);
+    setAudioGenerationProgress('Initializing audio generation...');
+    
     try {
-      // TODO: Implement TTS API call
-      // This will be implemented when you add the TTS API
-      const response = await fetch(`${API_BASE}/documents/${documentId}/generate-audio`, {
+      const response = await fetch(`${API_BASE}/documents/podcast/${script.id}/generate-audio`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          script_id: script.id,
-          voice_option: voiceOption,
+          save_to_disk: true,
         }),
       });
 
       if (response.ok) {
-        const data = await response.json();
-        setScript(prev => prev ? { ...prev, audioUrl: data.audio_url } : null);
+        const data: AudioGenerationResponse = await response.json();
+        setAudioLines(data.audio_lines);
+        
+        if (data.failed_count > 0) {
+          alert(`Audio generated with ${data.failed_count} failures out of ${data.total_lines} lines.`);
+        } else {
+          setAudioGenerationProgress(`Successfully generated ${data.generated_count} audio lines!`);
+        }
+        
+        // Auto-play first line
+        if (data.audio_lines.length > 0 && !data.audio_lines[0].error) {
+          setCurrentLineIndex(0);
+          // Wait a bit for UI to update, then play
+          setTimeout(() => {
+            if (audioRef.current) {
+              audioRef.current.play();
+              setIsPlaying(true);
+            }
+          }, 500);
+        }
       } else {
-        console.error('Failed to generate audio');
-        alert('Audio generation coming soon!');
+        const errorText = await response.text();
+        console.error('Failed to generate audio:', errorText);
+        alert('Failed to generate audio. Please try again.');
       }
     } catch (error) {
       console.error('Error generating audio:', error);
-      alert('Audio generation coming soon!');
+      alert('Error generating audio. Please check your connection.');
     } finally {
       setIsGeneratingAudio(false);
+      setTimeout(() => setAudioGenerationProgress(''), 3000);
     }
   };
 
@@ -110,6 +149,34 @@ export const PodcastPanel: React.FC<PodcastPanelProps> = ({ token, documentId })
     }
   };
 
+  const playNextLine = () => {
+    if (currentLineIndex < audioLines.length - 1) {
+      const nextIndex = currentLineIndex + 1;
+      setCurrentLineIndex(nextIndex);
+      setIsPlaying(true);
+      // Audio will auto-play via useEffect when src changes
+    } else {
+      // Reached end of podcast
+      setIsPlaying(false);
+      setCurrentLineIndex(0);
+    }
+  };
+
+  const playPreviousLine = () => {
+    if (currentLineIndex > 0) {
+      const prevIndex = currentLineIndex - 1;
+      setCurrentLineIndex(prevIndex);
+      setIsPlaying(true);
+    }
+  };
+
+  const jumpToLine = (index: number) => {
+    if (index >= 0 && index < audioLines.length && !audioLines[index].error) {
+      setCurrentLineIndex(index);
+      setIsPlaying(true);
+    }
+  };
+
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
@@ -121,18 +188,33 @@ export const PodcastPanel: React.FC<PodcastPanelProps> = ({ token, documentId })
     if (audio) {
       const updateTime = () => setCurrentTime(audio.currentTime);
       const updateDuration = () => setDuration(audio.duration);
+      const handleEnded = () => {
+        setIsPlaying(false);
+        // Auto-play next line when current line ends
+        playNextLine();
+      };
       
       audio.addEventListener('timeupdate', updateTime);
       audio.addEventListener('loadedmetadata', updateDuration);
-      audio.addEventListener('ended', () => setIsPlaying(false));
+      audio.addEventListener('ended', handleEnded);
 
       return () => {
         audio.removeEventListener('timeupdate', updateTime);
         audio.removeEventListener('loadedmetadata', updateDuration);
-        audio.removeEventListener('ended', () => setIsPlaying(false));
+        audio.removeEventListener('ended', handleEnded);
       };
     }
-  }, [script]);
+  }, [currentLineIndex, audioLines]);
+
+  // Auto-play when line changes
+  useEffect(() => {
+    if (audioRef.current && isPlaying) {
+      audioRef.current.play().catch(err => {
+        console.error('Error playing audio:', err);
+        setIsPlaying(false);
+      });
+    }
+  }, [currentLineIndex]);
 
   return (
     <div className="podcast-container">
@@ -232,23 +314,72 @@ export const PodcastPanel: React.FC<PodcastPanelProps> = ({ token, documentId })
           </div>
           
           <div className="script-content">
-            {script.dialogue.map((line, index) => (
-              <div key={index} className={`dialogue-line speaker-${line.speaker}`}>
-                <div className="speaker-label">
-                  {line.speaker === 1 ? script.speaker1 : script.speaker2}
+            {script.dialogue.map((line, index) => {
+              const isCurrentLine = audioLines.length > 0 && currentLineIndex === index;
+              const hasAudio = audioLines[index] && !audioLines[index].error;
+              const hasError = audioLines[index]?.error;
+              
+              return (
+                <div 
+                  key={index} 
+                  className={`dialogue-line speaker-${line.speaker} ${isCurrentLine ? 'playing' : ''} ${hasAudio ? 'has-audio' : ''}`}
+                  onClick={() => hasAudio ? jumpToLine(index) : null}
+                  style={{ cursor: hasAudio ? 'pointer' : 'default' }}
+                >
+                  <div className="line-number">
+                    {hasAudio && '🔊'}
+                    {hasError && '❌'}
+                    {!audioLines[index] && audioLines.length > 0 && '⏳'}
+                  </div>
+                  <div className="speaker-label">
+                    {line.speaker === 1 ? script.speaker1 : script.speaker2}
+                  </div>
+                  <div className="dialogue-text">{line.text}</div>
                 </div>
-                <div className="dialogue-text">{line.text}</div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
+          {/* Generation Progress */}
+          {audioGenerationProgress && (
+            <div className="generation-progress">
+              {audioGenerationProgress}
+            </div>
+          )}
+
           {/* Audio Player */}
-          {script.audioUrl && (
+          {audioLines.length > 0 && (
             <div className="audio-player">
-              <audio ref={audioRef} src={script.audioUrl} />
+              <audio 
+                ref={audioRef} 
+                src={`${API_BASE}/documents/audio/stream/${script.id}/${currentLineIndex}`}
+                autoPlay={isPlaying}
+              />
+              <div className="player-header">
+                <div className="now-playing">
+                  <span className="now-playing-label">Now Playing:</span>
+                  <span className="now-playing-text">
+                    Line {currentLineIndex + 1} of {audioLines.length} - {audioLines[currentLineIndex]?.voice}
+                  </span>
+                </div>
+              </div>
               <div className="player-controls">
+                <button 
+                  className="prev-btn" 
+                  onClick={playPreviousLine}
+                  disabled={currentLineIndex === 0}
+                >
+                  ⏮️
+                </button>
                 <button className="play-pause-btn" onClick={playPause}>
                   {isPlaying ? '⏸️' : '▶️'}
+                </button>
+                <button 
+                  className="next-btn" 
+                  onClick={playNextLine}
+                  disabled={currentLineIndex >= audioLines.length - 1}
+                >
+                  ⏭️
                 </button>
                 <div className="progress-container">
                   <div className="time-display">
@@ -257,7 +388,7 @@ export const PodcastPanel: React.FC<PodcastPanelProps> = ({ token, documentId })
                   <div className="progress-bar">
                     <div 
                       className="progress-fill"
-                      style={{ width: `${(currentTime / duration) * 100}%` }}
+                      style={{ width: `${(currentTime / duration) * 100 || 0}%` }}
                     ></div>
                   </div>
                 </div>

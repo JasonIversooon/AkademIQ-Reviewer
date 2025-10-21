@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
+import { API_BASE } from '../config';
 import '../styles/AuthPanel.css';
-
-// Vite exposes env variables prefixed with VITE_ via import.meta.env
-const API_BASE = (import.meta.env?.VITE_API_BASE as string) || 'http://192.168.0.146:8000';
 
 interface Props {
   onAuth: (token: string) => void;
